@@ -85,7 +85,7 @@ jobs:
               exit 1
           }
           Add-Content -Path $env:GITHUB_ENV -Value "TAILSCALE_IP=$tsIP"
-      
+       
       - name: Verify RDP Accessibility
         run: |
           Write-Host "Tailscale IP: $env:TAILSCALE_IP"
@@ -106,8 +106,10 @@ jobs:
           Write-Host "Password: $env:RDP_CREDS"
           Write-Host "==================`n"
           
-          # Keep runner active indefinitely (or until manually cancelled)
-          while ($true) {
+          # Keep runner active for 30 minutes, then exit gracefully
+          $endTime = (Get-Date).AddMinutes(30)
+          while ((Get-Date) -lt $endTime) {
               Write-Host "[$(Get-Date)] RDP Active - Use Ctrl+C in workflow to terminate"
               Start-Sleep -Seconds 300
           }
+          Write-Host "RDP session timeout reached. Exiting."
